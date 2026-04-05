@@ -47,7 +47,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("ℹ️ كيف يمكنني مساعدتك؟")
 
     elif query.data == "talk":
-        await query.edit_message_text("💬 اكتب أي شيء 😄")
+    await query.answer()
+    await query.message.reply_text("يرجى الانتظار من فضلك حتى تصل الرسالة الى المديرة ⏳")
 
     elif query.data == "back":
         keyboard = [
