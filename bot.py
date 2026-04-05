@@ -93,7 +93,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await asyncio.sleep(1)
 
         keyboard = [
-            [InlineKeyboardButton("🔥🔥 تواصل معي حبيبي انا لايف هنا 🍑👄 🔥🔥", url="https://t.me/USERNAME")]
+            [InlineKeyboardButton("🔥🔥 تواصل معي حبيبي انا لايف هنا 🍑👄 🔥🔥", url="https://sprlv.link/svy8zi6d")]
         ]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
