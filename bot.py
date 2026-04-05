@@ -1,55 +1,69 @@
 import os
 import logging
-from telegram import Update, ReplyKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
-# logs (important pour Railway)
 logging.basicConfig(level=logging.INFO)
 
 TOKEN = os.getenv("BOT_TOKEN")
 
-if not TOKEN:
-    raise ValueError("BOT_TOKEN manquant !")
-
-# 🔘 boutons
-keyboard = [
-    ["📋 القائمة", "ℹ️ مساعدة"],
-    ["💬 تحدث", "❌ خروج"]
-]
-
-reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-
 # /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name = update.effective_user.first_name
-    message = f"مرحبا {name} 👋\nكيف حالك يا حبيبي 😘"
-    await update.message.reply_text(message, reply_markup=reply_markup)
 
-# messages
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text
+    keyboard = [
+        [InlineKeyboardButton("📋 القائمة", callback_data="menu")],
+        [InlineKeyboardButton("ℹ️ مساعدة", callback_data="help")],
+        [InlineKeyboardButton("💬 تحدث", callback_data="talk")]
+    ]
 
-    if text == "📋 القائمة":
-        reply = "هذه هي القائمة 😎"
-    elif text == "ℹ️ مساعدة":
-        reply = "كيف يمكنني مساعدتك؟"
-    elif text == "💬 تحدث":
-        reply = "أنا هنا للدردشة 😄"
-    elif text == "❌ خروج":
-        reply = "إلى اللقاء 👋"
-    else:
-        reply = "لم أفهم 🤔"
+    reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await update.message.reply_text(reply)
+    await update.message.reply_text(
+        f"مرحبا {name} 👋\nاختار من هنا 👇",
+        reply_markup=reply_markup
+    )
 
-# 🚀 lancement
+# التعامل مع الضغط على الأزرار
+async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    if query.data == "menu":
+        keyboard = [
+            [InlineKeyboardButton("🔥 خدمات", callback_data="services")],
+            [InlineKeyboardButton("📞 تواصل", callback_data="contact")],
+            [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
+        ]
+        await query.edit_message_text("📋 القائمة:", reply_markup=InlineKeyboardMarkup(keyboard))
+
+    elif query.data == "services":
+        await query.edit_message_text("🔥 نقدم خدمات رائعة 😎")
+
+    elif query.data == "contact":
+        await query.edit_message_text("📞 تواصل معنا عبر واتساب")
+
+    elif query.data == "help":
+        await query.edit_message_text("ℹ️ كيف يمكنني مساعدتك؟")
+
+    elif query.data == "talk":
+        await query.edit_message_text("💬 اكتب أي شيء 😄")
+
+    elif query.data == "back":
+        keyboard = [
+            [InlineKeyboardButton("📋 القائمة", callback_data="menu")],
+            [InlineKeyboardButton("ℹ️ مساعدة", callback_data="help")]
+        ]
+        await query.edit_message_text("🔙 رجعنا:", reply_markup=InlineKeyboardMarkup(keyboard))
+
+# تشغيل البوت
 def main():
     app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT, handle_message))
+    app.add_handler(CallbackQueryHandler(button_handler))
 
-    print("Bot running 🚀")
+    print("Bot Inline Buttons 🚀")
     app.run_polling()
 
 if __name__ == "__main__":
