@@ -1,10 +1,17 @@
 import os
+import logging
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
+# logs (important pour Railway)
+logging.basicConfig(level=logging.INFO)
+
 TOKEN = os.getenv("BOT_TOKEN")
 
-# 🔘 Boutons (arabe)
+if not TOKEN:
+    raise ValueError("BOT_TOKEN manquant !")
+
+# 🔘 boutons
 keyboard = [
     ["📋 القائمة", "ℹ️ مساعدة"],
     ["💬 تحدث", "❌ خروج"]
@@ -15,12 +22,10 @@ reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 # /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name = update.effective_user.first_name
-
     message = f"مرحبا {name} 👋\nكيف حالك يا حبيبي 😘"
-
     await update.message.reply_text(message, reply_markup=reply_markup)
 
-# Gestion des boutons
+# messages
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
 
@@ -37,11 +42,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(reply)
 
-# app
-app = ApplicationBuilder().token(TOKEN).build()
+# 🚀 lancement
+def main():
+    app = ApplicationBuilder().token(TOKEN).build()
 
-app.add_handler(CommandHandler("start", start))
-app.add_handler(MessageHandler(filters.TEXT, handle_message))
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT, handle_message))
 
-print("Bot avec boutons جاهز 🚀")
-app.run_polling()
+    print("Bot running 🚀")
+    app.run_polling()
+
+if __name__ == "__main__":
+    main()
