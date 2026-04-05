@@ -50,24 +50,29 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data == "talk":
         await query.answer()
 
-        # 📩 premier message
+        # 📩 أول رسالة
         await query.message.reply_text("يرجى الانتظار من فضلك حتى تصل الرسالة الى المديرة ⏳")
 
         import asyncio
+        from telegram.constants import ChatAction
+
+        # ⏳ typing animation
+        await context.bot.send_chat_action(
+            chat_id=query.message.chat_id,
+            action=ChatAction.TYPING
+        )
+
         await asyncio.sleep(5)
 
-        # 🔘 bouton
+        # 🔘 الزر
         keyboard = [
-            [InlineKeyboardButton("تواصل معي حبيبي انا لايف هنا 🍑🔥👄", url="https://sprlv.link/svy8zi6d")]
+            [InlineKeyboardButton("🔥🔥 تواصل معي حبيبي انا لايف هنا 🍑👄 🔥🔥", url="https://sprlv.link/svy8zi6d")]
         ]
 
-        reply_markup = InlineKeyboardMarkup(keyboard)
+    reply_markup = InlineKeyboardMarkup(keyboard)
 
-        # 📩 deuxième message
-        await query.message.reply_text(
-            "تم الرد عليك 💌 اضغط هنا 👇",
-            reply_markup=reply_markup
-        )
+    # 🚀 زر فقط
+    await query.message.reply_text("ㅤ", reply_markup=reply_markup)
 
     elif query.data == "back":
         keyboard = [
