@@ -41,14 +41,33 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("🔥 نقدم خدمات رائعة 😎")
 
     elif query.data == "contact":
-        await query.edit_message_text("📞 تواصل معنا عبر واتساب")
+        await query.answer()
+        await query.message.reply_text("يرجى الانتظار من فضلك حتى تصل الرسالة الى المديرة ⏳")
 
     elif query.data == "help":
         await query.edit_message_text("ℹ️ كيف يمكنني مساعدتك؟")
 
     elif query.data == "talk":
-       await query.answer()
-       await query.message.reply_text("يرجى الانتظار من فضلك حتى تصل الرسالة الى المديرة ⏳")
+        await query.answer()
+
+        # 📩 premier message
+        await query.message.reply_text("يرجى الانتظار من فضلك حتى تصل الرسالة الى المديرة ⏳")
+
+        import asyncio
+        await asyncio.sleep(5)
+
+        # 🔘 bouton
+        keyboard = [
+            [InlineKeyboardButton("تواصل معي حبيبي انا لايف هنا 🍑🔥👄", url="https://sprlv.link/svy8zi6d")]
+        ]
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        # 📩 deuxième message
+        await query.message.reply_text(
+            "تم الرد عليك 💌 اضغط هنا 👇",
+            reply_markup=reply_markup
+        )
 
     elif query.data == "back":
         keyboard = [
