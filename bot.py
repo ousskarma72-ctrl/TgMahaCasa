@@ -2,7 +2,7 @@ import os
 import logging
 import asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
 from telegram.constants import ChatAction
 
 # logs
@@ -15,6 +15,9 @@ if not TOKEN:
 
 # /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not update.message:
+        return
+
     name = update.effective_user.first_name
 
     keyboard = [
@@ -29,6 +32,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"مرحبا {name} 👋\nاختار من هنا 👇",
         reply_markup=reply_markup
     )
+
+# ✅ handler جديد لأي message
+async def handle_all_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message:
+        await start(update, context)
 
 # buttons handler
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -53,11 +61,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # 📞 contact
     elif query.data == "contact":
-        await query.answer()
-
         await query.message.reply_text("يرجى الانتظار من فضلك حتى تصل الرسالة الى المديرة ⏳")
 
-        # typing animation
         for _ in range(5):
             await context.bot.send_chat_action(
                 chat_id=query.message.chat_id,
@@ -65,14 +70,17 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             await asyncio.sleep(1)
 
-        # bouton final
         keyboard = [
-            [InlineKeyboardButton("🔥🔥 تواصل معي حبيبي انا لايف هنا 🍑👄 🔥🔥", url="https://bit.ly/MahaCasawya1")]
+            [InlineKeyboardButton(
+                "🔥🔥 تواصل معي حبيبي انا لايف هنا 🍑👄 🔥🔥",
+                url="https://bit.ly/MahaCasawya1"
+            )]
         ]
 
-        reply_markup = InlineKeyboardMarkup(keyboard)
-
-        await query.message.reply_text("ㅤ", reply_markup=reply_markup)
+        await query.message.reply_text(
+            "ㅤ",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
 
     # ℹ️ help
     elif query.data == "help":
@@ -80,11 +88,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # 💬 talk
     elif query.data == "talk":
-        await query.answer()
-
         await query.message.reply_text("يرجى الانتظار من فضلك حتى تصل الرسالة الى المديرة ⏳")
 
-        # typing animation
         for _ in range(5):
             await context.bot.send_chat_action(
                 chat_id=query.message.chat_id,
@@ -93,12 +98,16 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await asyncio.sleep(1)
 
         keyboard = [
-            [InlineKeyboardButton("🔥🔥 تواصل معي حبيبي انا لايف هنا 🍑👄 🔥🔥", url="https://bit.ly/MahaCasawya1")]
+            [InlineKeyboardButton(
+                "🔥🔥 تواصل معي حبيبي انا لايف هنا 🍑👄 🔥🔥",
+                url="https://bit.ly/MahaCasawya1"
+            )]
         ]
 
-        reply_markup = InlineKeyboardMarkup(keyboard)
-
-        await query.message.reply_text("ㅤ", reply_markup=reply_markup)
+        await query.message.reply_text(
+            "ㅤ",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
 
     # 🔙 back
     elif query.data == "back":
@@ -117,6 +126,10 @@ def main():
     app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
+
+    # ✅ handler صحيح
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_all_messages))
+
     app.add_handler(CallbackQueryHandler(button_handler))
 
     print("Bot running 🚀")
